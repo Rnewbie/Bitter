@@ -1,0 +1,170 @@
+---
+title: "Proteocheometrics modeling of Bitter Taste Receptors"
+author: "Saw Simeon and Chanin Nantasenamat"
+date: "October 14, 2015"
+output: html_document
+---
+
+
+
+
+Principal components analysis fo natural bitter taste compounds
+```{r}
+library(caret)
+library(paran)
+library(grid)
+
+set.seed(2222)
+setwd("/Volumes/SAW SIMEON/Bitter/Padel_Descriptors/Natural/")
+nature <- read.csv("Natural.csv", header = TRUE)
+nature <- nature[-1]
+nature <- nature[, -nearZeroVar(nature)]
+paran(nature)
+pca <- prcomp(nature, center = TRUE, scale. = TRUE, retx = TRUE)
+summary(pca)
+loadings <- pca$rotation[, 1:6]
+scores <- pca$x[, 1:6]
+km <- kmeans(scores, center= 3, nstart = 5)
+ggdata <- data.frame(scores, Cluster = km$cluster)
+
+natural_pca_plot_scores <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Cluster)) +
+  geom_point(aes(fill = factor(Cluster)), size = 5, shape = 20, pch = 21, alpha = 0.8) +
+  ggtitle("Scores Plot ") +
+  stat_ellipse(aes(fill = factor(Cluster)), colour = "black", 
+               geom = "polygon", level = 0.95, alpha = 0.2) +
+  guides(color = guide_legend("Cluster"), fill = guide_legend("Cluster")) +
+  theme(
+    legend.position = ("none"),
+    panel.border = element_rect(linetype = "solid", colour = "black", fill = NA),
+    axis.text.y = element_text(size = 15),
+    axis.ticks.length = unit(0.3, "cm"),
+    axis.text.x = element_text(size = 15),
+    legend.title = element_blank(),
+    axis.title.x = element_text(colour = "black", size = 20),
+    axis.title.y =  element_text(color = "black", size = 20)) 
+print(natural_pca_plot_scores)
+```
+
+
+
+```{r}
+setwd("/Volumes/SAW SIMEON/Bitter/Padel_Descriptors/Synthetic/")
+synthetic <- read.csv("Synthetic.csv", header =  TRUE)
+synthetic <- synthetic[-1]
+synthetic <- nature[, -nearZeroVar(synthetic)]
+paran(synthetic)
+pca <- prcomp(synthetic, center = TRUE, scale. = TRUE, retx = TRUE)
+summary(pca)
+loadings <- pca$rotation[, 1:6]
+scores <- pca$x[, 1:6]
+km <- kmeans(scores, center= 3, nstart = 5)
+ggdata <- data.frame(scores, Cluster = km$cluster)
+
+synthetic_pca_plot_scores <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Cluster)) +
+  geom_point(aes(fill = factor(Cluster)), size = 5, shape = 20, pch = 21, alpha = 0.8) +
+  ggtitle("Scores Plot ") +
+  stat_ellipse(aes(fill = factor(Cluster)), colour = "black", 
+               geom = "polygon", level = 0.95, alpha = 0.2) +
+  guides(color = guide_legend("Cluster"), fill = guide_legend("Cluster")) +
+  theme(
+    legend.position = ("none"),
+    panel.border = element_rect(linetype = "solid", colour = "black", fill = NA),
+    axis.text.y = element_text(size = 15),
+    axis.ticks.length = unit(0.3, "cm"),
+    axis.text.x = element_text(size = 15),
+    legend.title = element_blank(),
+    axis.title.x = element_text(colour = "black", size = 20),
+    axis.title.y =  element_text(color = "black", size = 20)) 
+print(synthetic_pca_plot_scores)
+
+setwd("/Volumes/SAW SIMEON/Bitter/")
+```
+
+
+```{r}
+setwd("/Volumes/SAW SIMEON/Bitter/MEME_Motif/")
+library(readxl)
+protein <- read_excel("Motif_descriptors.xlsx")
+protein <- protein[-1]
+protein <- nature[, -nearZeroVar(protein)]
+paran(protein)
+pca <- prcomp(protein, center = TRUE, scale. = TRUE, retx = TRUE)
+summary(pca)
+loadings <- pca$rotation[, 1:5]
+scores <- pca$x[, 1:5]
+km <- kmeans(scores, center= 3, nstart = 5)
+ggdata <- data.frame(scores, Cluster = km$cluster)
+
+protein_pca_plot_scores <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Cluster)) +
+  geom_point(aes(fill = factor(Cluster)), size = 5, shape = 20, pch = 21, alpha = 0.8) +
+  ggtitle("Scores Plot ") +
+  stat_ellipse(aes(fill = factor(Cluster)), colour = "black", 
+               geom = "polygon", level = 0.95, alpha = 0.2) +
+  guides(color = guide_legend("Cluster"), fill = guide_legend("Cluster")) +
+  theme(
+    legend.position = ("none"),
+    panel.border = element_rect(linetype = "solid", colour = "black", fill = NA),
+    axis.text.y = element_text(size = 15),
+    axis.ticks.length = unit(0.3, "cm"),
+    axis.text.x = element_text(size = 15),
+    legend.title = element_blank(),
+    axis.title.x = element_text(colour = "black", size = 20),
+    axis.title.y =  element_text(color = "black", size = 20)) 
+print(protein_pca_plot_scores)
+
+setwd("/Volumes/SAW SIMEON/Bitter/")
+```
+
+
+
+
+
+
+
+
+function
+
+```{r, echo=FALSE, eval = FALSE}
+
+
+J48_training <- function(x,) {
+  library(parallel)
+  library(doSNOW)
+  cl <- makeCluster(8)
+  registerDoSNOW(cl)
+  
+  ok <- list(100)
+  ok <- foreach(i = 1:100 ) %dopar% {
+    in_train <- caret::createDataPartition(x$Activity, p = 0.80, list = FALSe)
+    train <- x[in_train, ]
+    test <- x[-in_train, ]
+    model_train <- RWeka::J48(Activity ~., data = train)
+    actual <- train$Activity
+    prediciton <- predict(model_train , train)
+    restuls <- caret::confusionMatrix(prediction, actual)
+    resutls <- table(prediction, actual)
+    results <- as.numeric(results)
+    
+  }
+}
+
+J48_10_CV <- function(x) {
+  library(parallel)
+  library(doSNOW)
+  cl <- makeCluster(8)
+  registerDoSNWO(cl)
+  ok <- list(100)
+  ok <- foreach(i = 1:100) %dopar% {
+    in_train <- caret::createDataPartition(x$Activity, p = 0.80, list = FALSe)
+    myData <- x[in_train, ]
+    test <- x[-in_train, ]
+    k = 10
+    index <- sample(1:k, nrow(myData), replace = TRUE)
+    folds <- 1:k
+    myRes <- data.frame()
+    for (j in 1:k)
+      training <- subset(myDAta, index %in% )
+  }
+}
+```
+
