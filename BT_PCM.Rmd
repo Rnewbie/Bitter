@@ -23,6 +23,7 @@ paran(nature)
 pca <- prcomp(nature, center = TRUE, scale. = TRUE, retx = TRUE)
 summary(pca)
 loadings <- pca$rotation[, 1:6]
+print(loadings)
 scores <- pca$x[, 1:6]
 km <- kmeans(scores, center= 3, nstart = 5)
 ggdata <- data.frame(scores, Cluster = km$cluster)
@@ -43,6 +44,28 @@ natural_pca_plot_scores <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Cluster
     axis.title.x = element_text(colour = "black", size = 20),
     axis.title.y =  element_text(color = "black", size = 20)) 
 print(natural_pca_plot_scores)
+
+##Loading plot
+km <- kmeans(loadings, center = 3, nstart = 5)
+ggdata <- data.frame(loadings, Cluster = km$cluster)
+set.seed(2220)
+natural_pca_plot_loadings <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Cluster)) +
+  geom_point(aes(fill = factor(Cluster)), size = 5, shape = 20, pch = 21, alpha = 0.8) +
+  ggtitle("Loading plot") +
+  stat_ellipse(aes(fill = factor(Cluster)), colour = "black", geom= "polygon", level = 0.95,
+               alpha = 0.2) +
+  guides(color = guide_legend("Cluster"), fill = guide_legend("Cluster")) +
+  theme(
+    legend.position = ("none"),
+    panel.border = element_rect(linetype = "solid", colour = "black", fill = NA, size = 1),
+    axis.text.y = element_text(size = 15),
+    axis.ticks.length = unit(0.3, "cm"),
+    axis.text.x = element_text(size = 15),
+    legend.title = element_text(size = 15),
+    legend.title = element_blank(),
+    axis.title.x = element_text(color = "black", size = 20),
+    axis.title.y = element_text(color = "black", size = 20)) 
+print(natural_pca_plot_loadings)
 ```
 
 
@@ -56,6 +79,7 @@ paran(synthetic)
 pca <- prcomp(synthetic, center = TRUE, scale. = TRUE, retx = TRUE)
 summary(pca)
 loadings <- pca$rotation[, 1:6]
+print(loadings)
 scores <- pca$x[, 1:6]
 km <- kmeans(scores, center= 3, nstart = 5)
 ggdata <- data.frame(scores, Cluster = km$cluster)
@@ -68,7 +92,7 @@ synthetic_pca_plot_scores <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Clust
   guides(color = guide_legend("Cluster"), fill = guide_legend("Cluster")) +
   theme(
     legend.position = ("none"),
-    panel.border = element_rect(linetype = "solid", colour = "black", fill = NA),
+    panel.border = element_rect(linetype = "solid", colour = "black", fill = NA, size = 1),
     axis.text.y = element_text(size = 15),
     axis.ticks.length = unit(0.3, "cm"),
     axis.text.x = element_text(size = 15),
@@ -76,6 +100,25 @@ synthetic_pca_plot_scores <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Clust
     axis.title.x = element_text(colour = "black", size = 20),
     axis.title.y =  element_text(color = "black", size = 20)) 
 print(synthetic_pca_plot_scores)
+set.seed(200)
+km <- kmeans(loadings, center = 3, nstart = 5)
+ggdata <- data.frame(loadings, Cluster = km$cluster)
+synthetic_pca_plot_loadings <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Cluster)) +
+  geom_point(aes(fill = factor(Cluster)), size = 5, shape = 20, pch = 21, alpha = 0.8) +
+  ggtitle("Loadings Plot") +
+  stat_ellipse(aes(fill = factor(Cluster)), colour = "black", 
+               geom = "polygon", level = 0.95, alpha = 0.2) +
+  guides(color = guide_legend("Cluster"), fill = guide_legend("Cluster")) +
+  theme(
+    legend.position = ("none"),
+    panel.border = element_rect(linetype = "solid", colour = "black", fill = NA, size = 1),
+    axis.text.y = element_text(size =15),
+    axis.ticks.length = unit(0.3, "cm"),
+    axis.text.x = element_text(size = 15),
+    legend.title = element_blank(),
+    axis.title.x = element_text(color = "black", size = 20),
+    axis.title.y = element_text(color = "black", size = 20))
+print(synthetic_pca_plot_loadings)
 
 setwd("/Volumes/SAW SIMEON/Bitter/")
 ```
@@ -91,6 +134,7 @@ paran(protein)
 pca <- prcomp(protein, center = TRUE, scale. = TRUE, retx = TRUE)
 summary(pca)
 loadings <- pca$rotation[, 1:5]
+print(loadings)
 scores <- pca$x[, 1:5]
 km <- kmeans(scores, center= 3, nstart = 5)
 ggdata <- data.frame(scores, Cluster = km$cluster)
@@ -111,18 +155,29 @@ protein_pca_plot_scores <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Cluster
     axis.title.x = element_text(colour = "black", size = 20),
     axis.title.y =  element_text(color = "black", size = 20)) 
 print(protein_pca_plot_scores)
-
+km <- kmeans(loadings, center = 3, nstart = 5)
+ggdata <- data.frame(loadings, Cluster = km$cluster)
+set.seed(200)
+protein_pca_plot_loadings <- ggplot(ggdata, aes(x = PC1, y = PC2, colour = Cluster)) +
+  geom_point(aes(fill = factor(Cluster)), size = 5, shape = 20, pch = 21, alpha = 0.8) +
+  ggtitle("Loading Plot") + 
+  stat_ellipse(aes(fill = factor(Cluster)), colour = "black",
+               geom = "polygon", level = 0.95, alpha = 0.2) +
+  guides(color = guide_legend("Cluster"), fill = guide_legend("Cluster")) +
+  theme(
+    legend.position = ("none"),
+    panel.border = element_rect(linetype = "solid", colour = "black", fill = NA, size = 1),
+    axis.text.y = element_text(size = 15),
+    axis.ticks.length = unit(0.3, "cm"),
+    axis.text.x = element_text(size = 15),
+    legend.title = element_blank(),
+    axis.title.x = element_text(colour = "black", size = 20),
+    axis.title.y = element_text(colour = "black", size = 20))
+print(protein_pca_plot_loadings)
 setwd("/Volumes/SAW SIMEON/Bitter/")
 ```
 
-
-
-
-
-
-
-
-function
+Preparing for the PCM dataset with three descriptors
 
 ```{r, echo=FALSE, eval = FALSE}
 
