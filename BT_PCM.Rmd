@@ -177,7 +177,71 @@ print(protein_pca_plot_loadings)
 setwd("/Volumes/SAW SIMEON/Bitter/")
 ```
 
-Preparing for the PCM dataset with three descriptors
+
+```{r, echo = FALSE, eval = FALSE}
+
+setwd("E:/Bitter")
+library(readxl)
+library(caret)
+library(Rcpi)
+data <- read_excel("BT_PCM_Data.xlsx")
+
+Activity <- data$Activity
+Activity <- as.factor(Activity)
+compound <- data[, 4:310]
+compound <- compound[, -nearZeroVar(compound)]
+
+
+protein <- data[, 311:880]
+protein <- protein[, -nearZeroVar(protein)]
+
+compound[compound == "0"] <- -1
+CxP <- getCPI(compound, protein, type = "tensorprod")
+CxP <- as.data.frame(CxP)
+dfcompound <- names(data.frame(compound[,1:43]))
+dfprotein <- names(data.frame(protein[,1:504]))
+compoundNamecross <- rep(dfcompound, each = 504)
+proteinNamecross <- rep(dfprotein, times = 43)
+label <- paste(compoundNamecross, proteinNamecross, sep="_")
+colnames(CxP) <- label
+PxP <- getCPI(protein, protein, type = "tensorprod")
+proteinName2 <- rep(dfprotein, times = 504)
+proteinName1 <- rep(dfprotein, each = 504)
+label_protein <- paste(proteinName1, proteinName2, sep = "_")
+colnames(PxP) <- label_protein
+index <-  c(1, 41, 81, 121, 161, 201, 241, 281, 321, 361, 401, 441,
+                     481, 521, 561, 601, 641, 681, 721, 761, 801, 841, 881,
+                     921, 961, 1001, 1041, 1081, 1121, 1161, 1201, 1241, 1281,
+                     1321, 1361, 1401, 1441, 1481, 1521)
+
+protein_selfcross <- PxP[, -index]
+transposedIndexed_protein <- t(protein_selfcross)
+index1 <- which(duplicated(transposedIndexed_protein))
+removed_duplicated_protein <- transposedIndexed_protein[-index1, ]
+PxP <- t(removed_duplicated_protein)
+
+CxC <- getCPI(compound, compound, type = "tensorprod")
+compoundName2 <- rep(dfcompound, times = 39)
+compoundName1 <- rep(dfcompound, each = 39)
+label <- paste(compoundName1, compoundName2, sep = "_")
+colnames(CxC) <- label
+index3 <- c(1, 41, 81, 121, 161, 201, 241, 281, 321, 361, 401, 441,
+              481, 521, 561, 601, 641, 681, 721, 761, 801, 841, 881,
+              921, 961, 1001, 1041, 1081, 1121, 1161, 1201, 1241, 1281,
+              1321, 1361, 1401, 1441, 1481, 1521)
+compound_selfcross <- CxC[, -index3]
+transposedIndexed_compound <- t(compound_selfcross)
+index4 <- which(duplicated(transposedIndexed_compound))
+removed_compound <- transposedIndexed_compound[-index4, ]
+compound_finalcrossterms <- t(removed_compound)
+CxC <- compound_finalcrossterms
+
+
+
+```
+
+
+
 
 ```{r, echo=FALSE, eval = FALSE}
 
